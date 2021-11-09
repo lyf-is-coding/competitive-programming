@@ -1,0 +1,81 @@
+// C++11 5.3.0 - GNU C++ Compiler with options: -lm -lcrypt -O2 -std=c++11 -pipe -DONLINE_JUDGE
+
+#include <bits/stdc++.h>
+
+std::vector<int>months { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+std::vector<int>months_leap { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+bool is_leap_year(int& year)
+{
+    if ( (year % 4 == 0 && year % 100 != 0) || year % 400 == 0 )
+        return true;
+
+    return false;
+}
+
+int calc_day_in_year(int day, int month, int year)
+{
+    int days=0;
+
+    if (is_leap_year(year))
+    {
+        for (int i=0; i < month-1; ++i)
+            days += months_leap[i];
+    }
+    else
+    {
+        for (int i=0; i < month-1; ++i)
+            days += months[i];
+    }
+
+    return days + day;
+}
+
+int main()
+{
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(0);
+
+    int n;
+    std::cin >> n;
+
+    int today, day, month, year, consumption;
+    int yesterday, last_day, last_month, last_year, last_consumption;
+
+	while (n)
+    {
+        int day_counter = 0, consumption_counter = 0;
+
+        // read first day for comparison
+        std::cin >> last_day >> last_month >> last_year >> last_consumption;
+        yesterday = calc_day_in_year(last_day, last_month, last_year);
+        --n;
+
+        while(n--)
+        {
+            std::cin >> day >> month >> year >> consumption;
+
+            today = calc_day_in_year(day, month, year);
+
+            // if today vs yesterday is in same year
+            // or day of last year (31/12) and first day of current year (1/1)
+            if ( (today == yesterday+1 && last_year == year) || (day == 1 && year == last_year+1 && last_day == 31) )
+            {
+                consumption_counter += consumption - last_consumption;
+                ++day_counter;
+            }
+
+            // assign today information to yesterday information
+            yesterday = today;
+            last_day = day;
+            last_month = month;
+            last_year = year;
+            last_consumption = consumption;
+        }
+
+        std::cout << day_counter << ' ' << consumption_counter << '\n';
+
+        std::cin >> n;
+    }
+}
